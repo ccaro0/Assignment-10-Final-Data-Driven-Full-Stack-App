@@ -1,5 +1,5 @@
-// Load the Google AI plugin and the helper that selects a Gemini model
-import { googleAI, gemini } from "@genkit-ai/googleai";
+// Load the Vertex AI plugin. It bills the Firebase project's Cloud account.
+import { vertexAI } from "@genkit-ai/google-genai";
 // Load the function that creates a Genkit AI instance
 import { genkit } from "genkit";
 // Load the helper that reads every review for one shoe
@@ -9,7 +9,7 @@ import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
 // Load the function that creates a Firestore handle from a Firebase app
 import { getFirestore } from "firebase/firestore";
 
-// GeminiSummary asks Google AI for a one-sentence summary of this shoe's reviews
+// GeminiSummary asks Vertex AI for a one-sentence summary of this shoe's reviews
 export async function GeminiSummary({ shoeId }) {
   // Build a server Firebase app authenticated with the session cookie
   const { firebaseServerApp } = await getAuthenticatedAppForUser();
@@ -32,20 +32,17 @@ export async function GeminiSummary({ shoeId }) {
 
   // Catch a missing key or a failed model call and show a short message instead
   try {
-    // Stop before calling the model when the Gemini key was never configured
-    if (!process.env.GEMINI_API_KEY) {
-      // Make sure GEMINI_API_KEY environment variable is set:
-      // https://genkit.dev/docs/get-started/
-      throw new Error(
-        'GEMINI_API_KEY not set. Set it with "firebase apphosting:secrets:set GEMINI_API_KEY --project week9-10-assignment"'
-      );
-    }
-
-    // Google AI reads GEMINI_API_KEY from the environment.
+    // Vertex bills week9-10-assignment. App Hosting uses that project's
+    // service account, so this call does not use the Gemini Developer API.
     const ai = genkit({
-      plugins: [googleAI()],
-      // Model that writes the one-sentence summary
-      model: gemini("gemini-3.8-flash"),
+      plugins: [
+        vertexAI({
+          projectId: "week9-10-assignment",
+          location: "global",
+        }),
+      ],
+      // Current Flash model. Gemini 3.8 Flash is served from the global endpoint.
+      model: vertexAI.model("gemini-3.8-flash"),
     });
     // Send the prompt and keep the text the model returns
     const { text } = await ai.generate(prompt);
