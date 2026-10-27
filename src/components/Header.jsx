@@ -10,8 +10,8 @@ import {
   signOut, // signs the current Firebase user out
   onIdTokenChanged, // runs when the user's ID token changes
 } from "@/src/lib/firebase/auth.js"; // client auth helpers live in this module
-// Pull in the helper that writes sample restaurants and reviews to Firestore
-import { addFakeRestaurantsAndReviews } from "@/src/lib/firebase/firestore.js";
+// Pull in the helper that writes sample shoes and reviews to Firestore
+import { addFakeShoesAndReviews } from "@/src/lib/firebase/firestore.js";
 // Pull in cookie helpers so the ID token can be stored for the server
 import { setCookie, deleteCookie } from "cookies-next";
 
@@ -72,9 +72,9 @@ export default function Header({ initialUser }) {
     <header>
       {/* Logo link sends the user back to the home page */}
       <Link href="/" className="logo">
-        {/* Friendly Eats wordmark */}
-        <img src="/friendly-eats.svg" alt="FriendlyEats" />
-        Friendly Eats {/* visible site name next to the logo */}
+        {/* Shoe icon next to the site name */}
+        <img src="/shoe.svg" alt="" width="36" height="36" />
+        Friendly Miles {/* visible site name next to the logo */}
       </Link>
       {/* Show the profile menu when a user is signed in */}
       {user ? (
@@ -107,8 +107,8 @@ export default function Header({ initialUser }) {
                 {/* Menu item that seeds Firestore with sample data */}
                 <li>
                   {/* Click runs the sample-data writer; "#" is cancelled by the handler */}
-                  <a href="#" onClick={addFakeRestaurantsAndReviews}>
-                    Add sample restaurants
+                  <a href="#" onClick={addFakeShoesAndReviews}>
+                    Add sample shoes
                   </a>
                 </li>
 

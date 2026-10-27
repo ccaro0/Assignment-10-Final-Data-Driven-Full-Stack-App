@@ -2,30 +2,30 @@
 import { vertexAI } from "@genkit-ai/google-genai";
 // Load the function that creates a Genkit AI instance
 import { genkit } from "genkit";
-// Load the helper that reads every review for one restaurant
-import { getReviewsByRestaurantId } from "@/src/lib/firebase/firestore.js";
+// Load the helper that reads every review for one shoe
+import { getReviewsByShoeId } from "@/src/lib/firebase/firestore.js";
 // Load the helper that builds a Firebase app from the signed-in user's session
 import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
 // Load the function that creates a Firestore handle from a Firebase app
 import { getFirestore } from "firebase/firestore";
 
-// GeminiSummary asks Vertex AI for a one-sentence summary of this restaurant's reviews
-export async function GeminiSummary({ restaurantId }) {
+// GeminiSummary asks Vertex AI for a one-sentence summary of this shoe's reviews
+export async function GeminiSummary({ shoeId }) {
   // Build a server Firebase app authenticated with the session cookie
   const { firebaseServerApp } = await getAuthenticatedAppForUser();
-  // Read this restaurant's reviews from the ratings subcollection
-  const reviews = await getReviewsByRestaurantId(
+  // Read this shoe's reviews from the ratings subcollection
+  const reviews = await getReviewsByShoeId(
     getFirestore(firebaseServerApp), // Firestore bound to the authenticated server app
-    restaurantId // id of the restaurant whose reviews should be summarized
+    shoeId // id of the shoe whose reviews should be summarized
   );
 
   // Character placed between reviews so the model can tell them apart
   const reviewSeparator = "@";
   // Instructions plus the joined review text sent to the model
   const prompt = `
-    Based on the following restaurant reviews, 
+    Based on the following running shoe reviews, 
     where each review is separated by a '${reviewSeparator}' character, 
-    create a one-sentence summary of what people think of the restaurant. 
+    create a one-sentence summary of what people think of the shoe. 
 
     Here are the reviews: ${reviews.map((review) => review.text).join(reviewSeparator)}
   `;
@@ -57,9 +57,9 @@ export async function GeminiSummary({ restaurantId }) {
     // Send the prompt and keep the text the model returns
     const { text } = await ai.generate(prompt);
 
-    // Render the summary under the restaurant details
+    // Render the summary under the shoe details
     return (
-      <div className="restaurant__review_summary">
+      <div className="shoe__review_summary">
         {/* The one-sentence summary */}
         <p>{text}</p>
         {/* Label that tells the reader the sentence came from Gemini */}
@@ -78,7 +78,7 @@ export async function GeminiSummary({ restaurantId }) {
 export function GeminiSummarySkeleton() {
   // Same wrapper class as the finished summary so the layout does not jump
   return (
-    <div className="restaurant__review_summary">
+    <div className="shoe__review_summary">
       {/* Message shown until the model responds */}
       <p>✨ Summarizing reviews with Gemini...</p>
     </div>

@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -43,11 +43,11 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "city",
+          "fieldPath": "brand",
           "order": "ASCENDING"
         },
         {
@@ -57,11 +57,11 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "city",
+          "fieldPath": "brand",
           "order": "ASCENDING"
         },
         {
@@ -71,11 +71,11 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "city",
+          "fieldPath": "brand",
           "order": "ASCENDING"
         },
         {
@@ -85,7 +85,7 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -99,7 +99,7 @@
       ]
     },
     {
-      "collectionGroup": "restaurants",
+      "collectionGroup": "shoes",
       "queryScope": "COLLECTION",
       "fields": [
         {

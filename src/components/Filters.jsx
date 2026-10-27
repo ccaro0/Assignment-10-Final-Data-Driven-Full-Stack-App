@@ -1,4 +1,4 @@
-// The filters shown on the restaurant listings page
+// The filters shown on the shoe listings page
 
 import Tag from "@/src/components/Tag.jsx";
 
@@ -38,7 +38,7 @@ export default function Filters({ filters, setFilters }) {
         <summary>
           <img src="/filter.svg" alt="filter" />
           <div>
-            <p>Restaurants</p>
+            <p>Shoes</p>
             <p>Sorted by {filters.sort || "Rating"}</p>
           </div>
         </summary>
@@ -54,45 +54,39 @@ export default function Filters({ filters, setFilters }) {
             label="Category"
             options={[
               "",
-              "Italian",
-              "Chinese",
-              "Japanese",
-              "Mexican",
-              "Indian",
-              "Mediterranean",
-              "Caribbean",
-              "Cajun",
-              "German",
-              "Russian",
-              "Cuban",
-              "Organic",
-              "Tapas",
+              "Road",
+              "Trail",
+              "Track",
+              "Racing",
+              "Daily trainer",
+              "Stability",
             ]}
             value={filters.category}
             onChange={(event) => handleSelectionChange(event, "category")}
             name="category"
-            icon="/food.svg"
+            icon="/shoe.svg"
           />
 
           <FilterSelect
-            label="City"
+            label="Brand"
             options={[
               "",
-              "New York",
-              "Los Angeles",
-              "London",
-              "Paris",
-              "Tokyo",
-              "Mumbai",
-              "Dubai",
-              "Amsterdam",
-              "Seoul",
-              "Singapore",
-              "Istanbul",
+              "Nike",
+              "Brooks",
+              "Hoka",
+              "ASICS",
+              "Saucony",
+              "New Balance",
+              "Adidas",
+              "On",
+              "Mizuno",
+              "Altra",
+              "Salomon",
+              "Puma",
             ]}
-            value={filters.city}
-            onChange={(event) => handleSelectionChange(event, "city")}
-            name="city"
+            value={filters.brand}
+            onChange={(event) => handleSelectionChange(event, "brand")}
+            name="brand"
             icon="/location.svg"
           />
 
@@ -121,7 +115,7 @@ export default function Filters({ filters, setFilters }) {
                 type="reset"
                 onClick={() => {
                   setFilters({
-                    city: "",
+                    brand: "",
                     category: "",
                     price: "",
                     sort: "",

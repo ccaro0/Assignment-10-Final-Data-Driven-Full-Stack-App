@@ -1,4 +1,4 @@
-### Friendly Eats with Next.js + Firebase
+### Friendly Miles with Next.js + Firebase
 
 The codelab has the full instructions, but as a quick start, you can do this.
 
@@ -24,4 +24,4 @@ npm run dev
 #### Use the application
 
 1. While on `http://localhost:3000/` within your browser, click the "Sign in" button in the top right corner and sign in.
-2. In the dropdown menu in the top right menu, select "Add sample restaurants".
+2. In the dropdown menu in the top right menu, select "Add sample shoes".

@@ -17,7 +17,7 @@ const ReviewDialog = ({
   review, // current rating and text controlled by the parent
   onChange, // function that updates one field of the draft review
   userId, // signed-in user id stored with the review
-  id, // restaurant id stored with the review
+  id, // shoe id stored with the review
 }) => {
   // Keep a reference to the native <dialog> element
   const dialog = useRef();
@@ -78,8 +78,8 @@ const ReviewDialog = ({
             />
           </p>
 
-          {/* Hidden field so the Server Action knows which restaurant was reviewed */}
-          <input type="hidden" name="restaurantId" value={id} />
+          {/* Hidden field so the Server Action knows which shoe was reviewed */}
+          <input type="hidden" name="shoeId" value={id} />
           {/* Hidden field so the Server Action knows which user wrote the review */}
           <input type="hidden" name="userId" value={userId} />
         </article>

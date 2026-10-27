@@ -1,5 +1,5 @@
-// Load the generator that builds fake restaurants and their reviews
-import { generateFakeRestaurantsAndReviews } from "@/src/lib/fakeRestaurants.js";
+// Load the generator that builds fake shoes and their reviews
+import { generateFakeShoesAndReviews } from "@/src/lib/fakeShoes.js";
 
 // Load the Firestore helpers used to read, filter, listen, and write documents
 import {
@@ -21,31 +21,28 @@ import {
 // Load the client-side Firestore instance used by browser-only writes and listeners
 import { db } from "@/src/lib/firebase/clientApp";
 
-// Save a new photo URL onto one restaurant document
-export async function updateRestaurantImageReference(
-  restaurantId,
-  publicImageUrl
-) {
-  // Point at the restaurant document inside the restaurants collection
-  const restaurantRef = doc(collection(db, "restaurants"), restaurantId);
+// Save a new photo URL onto one shoe document
+export async function updateShoeImageReference(shoeId, publicImageUrl) {
+  // Point at the shoe document inside the shoes collection
+  const shoeRef = doc(collection(db, "shoes"), shoeId);
   // Only write when a document reference was created
-  if (restaurantRef) {
+  if (shoeRef) {
     // Replace the photo field with the public URL of the uploaded image
-    await updateDoc(restaurantRef, { photo: publicImageUrl });
+    await updateDoc(shoeRef, { photo: publicImageUrl });
   }
 }
 
-// Update the restaurant totals and write the new review in one transaction
+// Update the shoe totals and write the new review in one transaction
 const updateWithRating = async (
   transaction, // Firestore transaction that can read and write atomically
-  docRef, // reference to the restaurant document being reviewed
+  docRef, // reference to the shoe document being reviewed
   newRatingDocument, // reference for the new document in the ratings subcollection
   review // rating, text, and user id submitted from the form
 ) => {
-  // Read the current restaurant inside the transaction
-  const restaurant = await transaction.get(docRef);
-  // Fields already stored on that restaurant
-  const data = restaurant.data();
+  // Read the current shoe inside the transaction
+  const shoe = await transaction.get(docRef);
+  // Fields already stored on that shoe
+  const data = shoe.data();
   // Add one to the existing count, or start at 1 when this is the first review
   const newNumRatings = data?.numRatings ? data.numRatings + 1 : 1;
   // Add this review's numeric rating to the running sum
@@ -53,9 +50,9 @@ const updateWithRating = async (
   // Average is the new sum divided by the new count
   const newAverage = newSumRating / newNumRatings;
 
-  // Write the updated count, sum, and average back onto the restaurant
+  // Write the updated count, sum, and average back onto the shoe
   transaction.update(docRef, {
-    numRatings: newNumRatings, // how many reviews the restaurant now has
+    numRatings: newNumRatings, // how many reviews the shoe now has
     sumRating: newSumRating, // total of every star rating
     avgRating: newAverage, // mean star rating shown on the card
   });
@@ -67,11 +64,11 @@ const updateWithRating = async (
   });
 };
 
-// Save one review and update that restaurant's rating totals together
-export async function addReviewToRestaurant(db, restaurantId, review) {
-  // Refuse to write when the caller did not name a restaurant
-  if (!restaurantId) {
-    throw new Error("No restaurant ID has been provided.");
+// Save one review and update that shoe's rating totals together
+export async function addReviewToShoe(db, shoeId, review) {
+  // Refuse to write when the caller did not name a shoe
+  if (!shoeId) {
+    throw new Error("No shoe ID has been provided.");
   }
 
   // Refuse to write when the caller did not pass a review
@@ -79,14 +76,12 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
     throw new Error("A valid review has not been provided.");
   }
 
-  // Roll back both writes if either the restaurant update or the review insert fails
+  // Roll back both writes if either the shoe update or the review insert fails
   try {
-    // Point at the restaurant document that will receive the new totals
-    const docRef = doc(collection(db, "restaurants"), restaurantId);
-    // Reserve a new auto-id document in that restaurant's ratings subcollection
-    const newRatingDocument = doc(
-      collection(db, `restaurants/${restaurantId}/ratings`),
-    );
+    // Point at the shoe document that will receive the new totals
+    const docRef = doc(collection(db, "shoes"), shoeId);
+    // Reserve a new auto-id document in that shoe's ratings subcollection
+    const newRatingDocument = doc(collection(db, `shoes/${shoeId}/ratings`));
 
     // Run the read and both writes as one atomic transaction
     await runTransaction(db, (transaction) =>
@@ -94,27 +89,23 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
     );
   } catch (error) {
     // Print the failure before rethrowing it to the Server Action
-    console.error(
-      "There was an error adding the rating to the restaurant",
-      error,
-    );
+    console.error("There was an error adding the rating to the shoe", error);
     // Let the caller see that the review was not saved
     throw error;
   }
 }
 
-
-// Add category, city, price, and sort constraints to a restaurants query
-function applyQueryFilters(q, { category, city, price, sort }) {
+// Add category, brand, price, and sort constraints to a shoes query
+function applyQueryFilters(q, { category, brand, price, sort }) {
   // Narrow the query to one category when the filter is present
   if (category) {
     // Keep documents whose category field equals the selected category
     q = query(q, where("category", "==", category));
   }
-  // Narrow the query to one city when the filter is present
-  if (city) {
-    // Keep documents whose city field equals the selected city
-    q = query(q, where("city", "==", city));
+  // Narrow the query to one brand when the filter is present
+  if (brand) {
+    // Keep documents whose brand field equals the selected brand
+    q = query(q, where("brand", "==", brand));
   }
   // Narrow the query to one price level when the filter is present
   if (price) {
@@ -126,25 +117,25 @@ function applyQueryFilters(q, { category, city, price, sort }) {
     // Highest avgRating first
     q = query(q, orderBy("avgRating", "desc"));
   } else if (sort === "Review") {
-    // Most-reviewed restaurants first when the user sorts by review count
+    // Most-reviewed shoes first when the user sorts by review count
     q = query(q, orderBy("numRatings", "desc"));
   }
   // Hand the filtered, ordered query back to the caller
   return q;
 }
 
-// Read restaurants once; db defaults to the client instance and filters default to none
-export async function getRestaurants(db = db, filters = {}) {
-  // Start with every document in the restaurants collection
-  let q = query(collection(db, "restaurants"));
+// Read shoes once; db defaults to the client instance and filters default to none
+export async function getShoes(db = db, filters = {}) {
+  // Start with every document in the shoes collection
+  let q = query(collection(db, "shoes"));
 
-  // Apply the category, city, price, and sort filters from the caller
+  // Apply the category, brand, price, and sort filters from the caller
   q = applyQueryFilters(q, filters);
   // Run the query and wait for the matching documents
   const results = await getDocs(q);
   // Turn each Firestore document into a plain object the UI can render
   return results.docs.map((doc) => {
-    // Build one restaurant object for this document
+    // Build one shoe object for this document
     return {
       // Keep the document id, which is not included in doc.data()
       id: doc.id,
@@ -157,8 +148,8 @@ export async function getRestaurants(db = db, filters = {}) {
   });
 }
 
-// Listen for restaurant changes and pass each new list to cb
-export function getRestaurantsSnapshot(cb, filters = {}) {
+// Listen for shoe changes and pass each new list to cb
+export function getShoesSnapshot(cb, filters = {}) {
   // Refuse to subscribe when the caller did not pass a function
   if (typeof cb !== "function") {
     // Report the bad argument in the console
@@ -167,16 +158,16 @@ export function getRestaurantsSnapshot(cb, filters = {}) {
     return;
   }
 
-  // Start with every document in the restaurants collection
-  let q = query(collection(db, "restaurants"));
+  // Start with every document in the shoes collection
+  let q = query(collection(db, "shoes"));
   // Apply the same filters used by the one-time query
   q = applyQueryFilters(q, filters);
 
   // Re-run the mapper whenever the query results change, and return the unsubscribe function
   return onSnapshot(q, (querySnapshot) => {
-    // Turn the latest documents into plain restaurant objects
+    // Turn the latest documents into plain shoe objects
     const results = querySnapshot.docs.map((doc) => {
-      // Build one restaurant object for this document
+      // Build one shoe object for this document
       return {
         // Keep the document id
         id: doc.id,
@@ -193,17 +184,17 @@ export function getRestaurantsSnapshot(cb, filters = {}) {
   });
 }
 
-// Read one restaurant document by its id
-export async function getRestaurantById(db, restaurantId) {
+// Read one shoe document by its id
+export async function getShoeById(db, shoeId) {
   // Refuse to query when the id is missing
-  if (!restaurantId) {
+  if (!shoeId) {
     // Report the bad id in the console
-    console.log("Error: Invalid ID received: ", restaurantId);
+    console.log("Error: Invalid ID received: ", shoeId);
     // Stop before calling Firestore
     return;
   }
-  // Point at restaurants/{restaurantId}
-  const docRef = doc(db, "restaurants", restaurantId);
+  // Point at shoes/{shoeId}
+  const docRef = doc(db, "shoes", shoeId);
   // Fetch that document and wait for the snapshot
   const docSnap = await getDoc(docRef);
   // Return the stored fields as a plain object
@@ -215,12 +206,12 @@ export async function getRestaurantById(db, restaurantId) {
   };
 }
 
-// Listen to one restaurant document and pass each update to cb
-export function getRestaurantSnapshotById(restaurantId, cb) {
+// Listen to one shoe document and pass each update to cb
+export function getShoeSnapshotById(shoeId, cb) {
   // Refuse to subscribe when the id is missing
-  if (!restaurantId) {
+  if (!shoeId) {
     // Report the bad id in the console
-    console.log("Error: Invalid ID received: ", restaurantId);
+    console.log("Error: Invalid ID received: ", shoeId);
     // Stop before calling onSnapshot
     return;
   }
@@ -233,8 +224,8 @@ export function getRestaurantSnapshotById(restaurantId, cb) {
     return;
   }
 
-  // Point at restaurants/{restaurantId} on the client database
-  const docRef = doc(db, "restaurants", restaurantId);
+  // Point at shoes/{shoeId} on the client database
+  const docRef = doc(db, "shoes", shoeId);
   // Re-run the callback whenever that document changes, and return the unsubscribe function
   return onSnapshot(docRef, (docSnap) => {
     // Deliver the latest fields as a plain object
@@ -247,20 +238,20 @@ export function getRestaurantSnapshotById(restaurantId, cb) {
   });
 }
 
-// Read every review stored under one restaurant, newest first
-export async function getReviewsByRestaurantId(db, restaurantId) {
-  // Refuse to query when the restaurant id is missing
-  if (!restaurantId) {
+// Read every review stored under one shoe, newest first
+export async function getReviewsByShoeId(db, shoeId) {
+  // Refuse to query when the shoe id is missing
+  if (!shoeId) {
     // Report the bad id in the console
-    console.log("Error: Invalid restaurantId received: ", restaurantId);
+    console.log("Error: Invalid shoeId received: ", shoeId);
     // Stop before calling Firestore
     return;
   }
 
   // Build a query against the ratings subcollection, sorted by newest timestamp
   const q = query(
-    // ratings lives under restaurants/{restaurantId}
-    collection(db, "restaurants", restaurantId, "ratings"),
+    // ratings lives under shoes/{shoeId}
+    collection(db, "shoes", shoeId, "ratings"),
     // Newest reviews first
     orderBy("timestamp", "desc")
   );
@@ -282,20 +273,20 @@ export async function getReviewsByRestaurantId(db, restaurantId) {
   });
 }
 
-// Listen to one restaurant's reviews and pass each new list to cb
-export function getReviewsSnapshotByRestaurantId(restaurantId, cb) {
-  // Refuse to subscribe when the restaurant id is missing
-  if (!restaurantId) {
+// Listen to one shoe's reviews and pass each new list to cb
+export function getReviewsSnapshotByShoeId(shoeId, cb) {
+  // Refuse to subscribe when the shoe id is missing
+  if (!shoeId) {
     // Report the bad id in the console
-    console.log("Error: Invalid restaurantId received: ", restaurantId);
+    console.log("Error: Invalid shoeId received: ", shoeId);
     // Stop before calling onSnapshot
     return;
   }
 
   // Build the same newest-first query used by the one-time read
   const q = query(
-    // ratings lives under restaurants/{restaurantId} on the client database
-    collection(db, "restaurants", restaurantId, "ratings"),
+    // ratings lives under shoes/{shoeId} on the client database
+    collection(db, "shoes", shoeId, "ratings"),
     // Newest reviews first
     orderBy("timestamp", "desc")
   );
@@ -319,28 +310,28 @@ export function getReviewsSnapshotByRestaurantId(restaurantId, cb) {
   });
 }
 
-// Write a batch of generated restaurants, each with its own reviews
-export async function addFakeRestaurantsAndReviews() {
-  // Generate the sample restaurants and the reviews that belong to each one
-  const data = await generateFakeRestaurantsAndReviews();
-  // Handle one restaurant and its reviews at a time
-  for (const { restaurantData, ratingsData } of data) {
-    // Keep going with the next restaurant if this write fails
+// Write a batch of generated shoes, each with its own reviews
+export async function addFakeShoesAndReviews() {
+  // Generate the sample shoes and the reviews that belong to each one
+  const data = await generateFakeShoesAndReviews();
+  // Handle one shoe and its reviews at a time
+  for (const { shoeData, ratingsData } of data) {
+    // Keep going with the next shoe if this write fails
     try {
-      // Add the restaurant document and keep the reference Firestore returns
+      // Add the shoe document and keep the reference Firestore returns
       const docRef = await addDoc(
-        // Write into the top-level restaurants collection
-        collection(db, "restaurants"),
-        // Fields for this generated restaurant
-        restaurantData
+        // Write into the top-level shoes collection
+        collection(db, "shoes"),
+        // Fields for this generated shoe
+        shoeData
       );
 
-      // Write each review into that restaurant's ratings subcollection
+      // Write each review into that shoe's ratings subcollection
       for (const ratingData of ratingsData) {
         // Wait for this review document to be created before the next one
         await addDoc(
-          // Subcollection path uses the id of the restaurant just created
-          collection(db, "restaurants", docRef.id, "ratings"),
+          // Subcollection path uses the id of the shoe just created
+          collection(db, "shoes", docRef.id, "ratings"),
           // Fields for this generated review
           ratingData
         );

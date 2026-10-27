@@ -3,7 +3,7 @@ import renderStars from "@/src/components/Stars.jsx";
 export function Review({ rating, text, timestamp }) {
   return (
     <li className="review__item">
-      <ul className="restaurant__rating">{renderStars(rating)}</ul>
+      <ul className="shoe__rating">{renderStars(rating)}</ul>
       <p>{text}</p>
 
 
@@ -21,7 +21,7 @@ export function Review({ rating, text, timestamp }) {
 export function ReviewSkeleton() {
   return (
     <li className="review__item">
-      <div className="restaurant__rating">
+      <div className="shoe__rating">
         <div
           style={{
             height: "2rem",
