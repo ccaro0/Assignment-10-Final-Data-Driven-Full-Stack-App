@@ -37,18 +37,19 @@ export async function GeminiSummary({ shoeId }) {
       // Make sure GEMINI_API_KEY environment variable is set:
       // https://genkit.dev/docs/get-started/
       throw new Error(
-        'GEMINI_API_KEY not set. Set it with "firebase apphosting:secrets:set GEMINI_API_KEY"'
+        'GEMINI_API_KEY not set. Set it with "firebase apphosting:secrets:set GEMINI_API_KEY --project week9-10-assignment"'
       );
     }
 
-    // Vertex AI uses the Firebase project's Cloud Billing account.
-    // On App Hosting the runtime service account is the credential.
+    // Vertex AI bills the week9-10-assignment Cloud account.
+    // The App Hosting secret is passed in as the Vertex API key.
     const ai = genkit({
       plugins: [
         // Point Vertex at this Firebase project and the global Gemini endpoint
         vertexAI({
-          projectId: "week-07-friendlyeats-codelab", // Cloud project that owns the billing account
+          projectId: "week9-10-assignment", // Cloud project that owns the billing account
           location: "global", // region required by the Gemini 3.5 model
+          apiKey: process.env.GEMINI_API_KEY, // secret mapped in apphosting.yaml
         }),
       ],
       // Model that writes the one-sentence summary
