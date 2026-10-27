@@ -1,5 +1,5 @@
-// Load the Vertex AI plugin that bills the Firebase project's Cloud account
-import { vertexAI } from "@genkit-ai/google-genai";
+// Load the Google AI plugin and the helper that selects a Gemini model
+import { googleAI, gemini } from "@genkit-ai/googleai";
 // Load the function that creates a Genkit AI instance
 import { genkit } from "genkit";
 // Load the helper that reads every review for one shoe
@@ -9,7 +9,7 @@ import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
 // Load the function that creates a Firestore handle from a Firebase app
 import { getFirestore } from "firebase/firestore";
 
-// GeminiSummary asks Vertex AI for a one-sentence summary of this shoe's reviews
+// GeminiSummary asks Google AI for a one-sentence summary of this shoe's reviews
 export async function GeminiSummary({ shoeId }) {
   // Build a server Firebase app authenticated with the session cookie
   const { firebaseServerApp } = await getAuthenticatedAppForUser();
@@ -41,19 +41,11 @@ export async function GeminiSummary({ shoeId }) {
       );
     }
 
-    // Vertex AI bills the week9-10-assignment Cloud account.
-    // The App Hosting secret is passed in as the Vertex API key.
+    // Google AI reads GEMINI_API_KEY from the environment.
     const ai = genkit({
-      plugins: [
-        // Point Vertex at this Firebase project and the global Gemini endpoint
-        vertexAI({
-          projectId: "week9-10-assignment", // Cloud project that owns the billing account
-          location: "global", // region required by the Gemini 3.5 model
-          apiKey: process.env.GEMINI_API_KEY, // secret mapped in apphosting.yaml
-        }),
-      ],
+      plugins: [googleAI()],
       // Model that writes the one-sentence summary
-      model: vertexAI.model("gemini-3.5-flash-lite"),
+      model: gemini("gemini-3.8-flash"),
     });
     // Send the prompt and keep the text the model returns
     const { text } = await ai.generate(prompt);
