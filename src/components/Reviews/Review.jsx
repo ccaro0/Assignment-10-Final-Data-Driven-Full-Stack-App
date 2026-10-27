@@ -11,7 +11,8 @@ export function Review({ rating, text, timestamp }) {
       <time>
         {new Intl.DateTimeFormat("en-GB", {
           dateStyle: "medium",
-        }).format(timestamp)}
+          timeZone: "UTC",
+        }).format(new Date(timestamp))}
       </time>
 
     </li>
